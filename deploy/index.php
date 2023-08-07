@@ -65,7 +65,7 @@
             <?php
                 if (empty($_query)) {
                     echo <<<EOS
-                        <div class="no-query">
+                        <div class="error">
                             ERROR: query missing; append '?q=input' to URL.
                         </div>
                         EOS;
@@ -73,34 +73,46 @@
                     $arr = array();
                     $fu  = new font_util();
                     if (!$fu->get_ascii_fonts($fu->get_font_dir(), $arr)) {
-                        echo "<p>Failed to list fonts!</p>";
-                    }
+                        echo <<<EOS
+                        <div class="error">
+                            ERROR: failed to list fonts!
+                        </div>
+                        EOS;
+                    } else {
+                        $font_count = count($arr);
 
-                    foreach ($arr as $font) {
-                        $ascii = array();
-                        if ($fu->exec_figlet($font, $_query, $ascii)) {
-                            $font        = substr(strrchr($font, "/"), 1);
-                            $ascii_lines = "";
-
-                            foreach ($ascii as $line) {
-                                if (!empty($line)) {
-                                    $line = str_replace(" ", "&#160;", $line);
-                                    $ascii_lines .= "<span>" . htmlentities($line, ENT_HTML5 | ENT_QUOTES | ENT_SUBSTITUTE,
-                                        "UTF-8", false) . "</span>" . "<br/>";
-                                }
-                            }
-
-                            echo <<<EOS
-                                <div class="font-entry">
-                                    <hr/>
-                                    <p><b>{$font}</b></p>
-                                    <div class="font-entry-ascii">
-                                        {$ascii_lines}
-                                    </div>
-                                </div>
+                        echo <<<EOS
+                            <div>
+                                Generated {$font_count} variations:
+                            </div>
                             EOS;
-                        } else {
-                            echo "Failed to execute ASCII generator!";
+
+                        foreach ($arr as $font) {
+                            $ascii = array();
+                            if ($fu->exec_figlet($font, $_query, $ascii)) {
+                                $font        = substr(strrchr($font, "/"), 1);
+                                $ascii_lines = "";
+
+                                foreach ($ascii as $line) {
+                                    if (!empty($line)) {
+                                        $line = str_replace(" ", "&#160;", $line);
+                                        $ascii_lines .= "<span>" . htmlentities($line, ENT_HTML5 | ENT_QUOTES | ENT_SUBSTITUTE,
+                                            "UTF-8", false) . "</span>" . "<br/>";
+                                    }
+                                }
+
+                                echo <<<EOS
+                                    <div class="font-entry">
+                                        <hr/>
+                                        <p><b>{$font}</b></p>
+                                        <div class="font-entry-ascii">
+                                            {$ascii_lines}
+                                        </div>
+                                    </div>
+                                EOS;
+                            } else {
+                                echo "Failed to execute ASCII generator!";
+                            }
                         }
                     }
                 }
