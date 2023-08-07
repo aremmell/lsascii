@@ -23,3 +23,29 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
+ @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap');
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: #2a2732 !important;
+    color:  #cccccc !important;
+    font-size: 1em;
+    padding: 25px;
+    margin-bottom: 45px;
+}
+
+div.no-query {
+    color: red;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+div.font-entry {
+    margin-top: 2em;
+}
+
+div.font-entry-ascii {
+    font-family: monospace, fixed; font-weight: bold;
+}

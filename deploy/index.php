@@ -26,7 +26,7 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <title>lsascii</title>
+        <title>lsascii | ASCII art generator</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="author" content="Ryan M. Lederman <lederman@gmail.com>">
@@ -52,11 +52,63 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
         <link rel="stylesheet" href="css/index.css">
 
-        <!--<script src="js/jquery-3.6.4.min.js"></script>-->
+        <script src="js/jquery-3.6.4.min.js"></script>
     </head>
+
+    <?php
+        require("font-util.php");
+        $_query = empty($_GET['q']) ? "" : urldecode($_GET['q']);
+    ?>
 
     <body>
         <div class="container-fluid">
+            <?php
+                if (empty($_query)) {
+                    echo <<<EOS
+                        <div class="no-query">
+                            ERROR: query missing; append '?q=input' to URL.
+                        </div>
+                        EOS;
+                } else {
+                    $arr = array();
+                    $fu  = new font_util();
+                    if (!$fu->get_ascii_fonts($fu->get_font_dir(), $arr)) {
+                        echo "<p>Failed to list fonts!</p>";
+                    }
+
+                    foreach ($arr as $font) {
+                        $ascii = array();
+                        if ($fu->exec_figlet($font, $_query, $ascii)) {
+                            $font        = substr(strrchr($font, "/"), 1);
+                            $ascii_lines = "";
+
+                            foreach ($ascii as $line) {
+                                if (!empty($line)) {
+                                    $line = str_replace(" ", "&#160;", $line);
+                                    $ascii_lines .= "<span>" . htmlentities($line, ENT_HTML5 | ENT_QUOTES | ENT_SUBSTITUTE,
+                                        "UTF-8", false) . "</span>" . "<br/>";
+                                }
+                            }
+
+                            echo <<<EOS
+                                <div class="font-entry">
+                                    <hr/>
+                                    <p><b>{$font}</b></p>
+                                    <div class="font-entry-ascii">
+                                        {$ascii_lines}
+                                    </div>
+                                </div>
+                            EOS;
+                        } else {
+                            echo "Failed to execute ASCII generator!";
+                        }
+                    }
+                }
+            ?>
         </div>
+        <div class="footer">
+            <div class="footer-entry"></div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
     </body>
 </html>
